@@ -70,3 +70,45 @@ File "/Users/brucemoxon/DEV/pythonenvs/nst-doodle/lib/python3.9/site-packages/ke
   File "/Users/brucemoxon/DEV/pythonenvs/nst-doodle/lib/python3.9/site-packages/keras/engine/keras_tensor.py", line 329, in __str__
     return "KerasTensor(type_spec=%s%s%s%s)" % (
 RecursionError: maximum recursion depth exceeded while calling a Python object
+
+
+Try adding the gradient tape ...
+
+(nst-doodle) (base) brucemoxon@tigrisbrucis Neural-Style-Transfer % python3 INetwork.py ./images/inputs/content/Dipping-Sun.jpg ./images/inputs/style/starry_night.jpg bcmtest
+...
+Traceback (most recent call last):
+  File "/Users/brucemoxon/DEV/workspace/Neural-Style-Transfer/INetwork.py", line 534, in <module>
+    grads = tape.gradient(loss, combination_image)
+  File "/Users/brucemoxon/DEV/pythonenvs/nst-doodle/lib/python3.9/site-packages/tensorflow/python/eager/backprop.py", line 1112, in gradient
+    flat_grad = imperative_grad.imperative_grad(
+  File "/Users/brucemoxon/DEV/pythonenvs/nst-doodle/lib/python3.9/site-packages/tensorflow/python/eager/imperative_grad.py", line 67, in imperative_grad
+    return pywrap_tfe.TFE_Py_TapeGradient(
+AttributeError: 'KerasTensor' object has no attribute '_id'
+
+Back to original gradient computation, with eager execution disabled up at the top (before
+first Keras call)
+
+# bcm
+# for eager execution disabling in TF2
+# https://github.com/tensorflow/tensorflow/issues/33135
+# doesnt seem to work ... recursion depth/infinite recursion??
+K.tf.compat.v1.disable_eager_execution()
+
+(nst-doodle) (base) brucemoxon@tigrisbrucis Neural-Style-Transfer % python3 INetwork.py ./images/inputs/content/Dipping-Sun.jpg ./images/inputs/style/starry_night.jpg bcmtest
+2022-12-02 11:38:05.021345: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2022-12-02 11:38:09.483907: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2022-12-02 11:38:09.506274: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:357] MLIR V1 optimization pass is not enabled
+2022-12-02 11:38:09.602273: W tensorflow/c/c_api.cc:291] Operation '{name:'conv4_2/bias/Assign' id:229 op device:{requested: '', assigned: ''} def:{{{node conv4_2/bias/Assign}} = AssignVariableOp[_has_manual_control_dependencies=true, dtype=DT_FLOAT, validate_shape=false](conv4_2/bias, conv4_2/bias/Initializer/zeros)}}' was changed by setting attribute after it was run by a session. This mutation will have no effect, and will trigger an error in the future. Either don't modify nodes after running them or create a new session.
+Model loaded.
+Starting iteration 1 of 10
+2022-12-02 11:38:12.866224: W tensorflow/c/c_api.cc:291] Operation '{name:'Variable_2/Assign' id:444 op device:{requested: '', assigned: ''} def:{{{node Variable_2/Assign}} = AssignVariableOp[_has_manual_control_dependencies=true, dtype=DT_FLOAT, validate_shape=false](Variable_2, Variable_2/Initializer/initial_value)}}' was changed by setting attribute after it was run by a session. This mutation will have no effect, and will trigger an error in the future. Either don't modify nodes after running them or create a new session.
+Current loss value: 209525980.0  Improvement : 0.000 %
+Rescaling Image to (400, 713)
+Image saved as bcmtest_at_iteration_1.png
+Iteration 1 completed in 125s
+Starting iteration 2 of 10
+...
+
+~ 2 min 1 iteration ...

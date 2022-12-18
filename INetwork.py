@@ -16,6 +16,8 @@ from keras.layers import Input
 from keras.layers.convolutional import Convolution2D, AveragePooling2D, MaxPooling2D
 from keras import backend as K
 from keras.utils.data_utils import get_file
+# bcm
+# https://github.com/OlafenwaMoses/ImageAI/issues/494
 #from keras.utils.layer_utils import convert_all_kernels_in_model
 
 """
@@ -296,6 +298,9 @@ def pooling_func(x):
     else:
         return MaxPooling2D((2, 2), strides=(2, 2))(x)
 
+# bcm
+# for eager execution disabling in TF2
+# https://github.com/tensorflow/tensorflow/issues/33135
 K.tf.compat.v1.disable_eager_execution()
 
 # get tensor representations of our images

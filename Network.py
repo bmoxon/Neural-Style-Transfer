@@ -16,7 +16,9 @@ from keras.layers import Input
 from keras.layers.convolutional import Convolution2D, AveragePooling2D, MaxPooling2D
 from keras import backend as K
 from keras.utils.data_utils import get_file
-from keras.utils.layer_utils import convert_all_kernels_in_model
+# bcm
+# https://github.com/OlafenwaMoses/ImageAI/issues/494
+# from keras.utils.layer_utils import convert_all_kernels_in_model
 
 """
 Neural Style Transfer with Keras 2.0.5
@@ -293,6 +295,11 @@ def pooling_func(x):
     else:
         return MaxPooling2D((2, 2), strides=(2, 2))(x)
 
+# bcm
+# for eager execution disabling in TF2
+# https://github.com/tensorflow/tensorflow/issues/33135
+# doesnt seem to work ... recursion depth/infinite recursion??
+K.tf.compat.v1.disable_eager_execution()
 
 # get tensor representations of our images
 base_image = K.variable(preprocess_image(base_image_path, True, read_mode=read_mode))
@@ -620,8 +627,8 @@ for i in range(num_iter):
     print('Image saved as', fname)
     print('Iteration %d completed in %ds' % (i + 1, end_time - start_time))
 
-    if improvement_threshold is not 0.0:
-        if improvement < improvement_threshold and improvement is not 0.0:
+    if improvement_threshold != 0.0:
+        if improvement < improvement_threshold and improvement != 0.0:
             print("Improvement (%f) is less than improvement threshold (%f). Early stopping script." % (
                 improvement, improvement_threshold))
             exit()
