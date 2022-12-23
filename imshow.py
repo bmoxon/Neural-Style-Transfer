@@ -15,7 +15,8 @@ def main() -> int:
         Usage()
     filepath = sys.argv[1]
     if filepath.find('http') >= 0:
-        url = quote(filepath, safe=':/')
+        url = quote(filepath, safe=':/?%=&')
+        #url = quote(filepath)
         print('url = {}'.format(url))
         urllib.request.urlretrieve(url,'content.xxx')
         im=Image.open('content.xxx')

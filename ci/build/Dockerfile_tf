@@ -1,0 +1,31 @@
+# Pull base image.
+FROM tensorflow/tensorflow
+ 
+LABEL maintainer="Bruce Moxon <brucemoxon@microsoft.com>"
+
+# additional installs
+
+RUN apt-get install wget
+
+RUN wget -O azcopy\_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && \
+    mkdir azcopy\_v10 && \
+    tar -xf azcopy\_v10.tar.gz -C azcopy\_v10 && \
+    ln -s azcopy_v10/azcopy_linux_amd64_10.16.2/azcopy /usr/local/bin/azcopy
+
+# USER = nst
+# WORKDIR = /home/nst
+
+WORKDIR /root
+# COPY requirements_tf.txt .
+COPY INetwork.py .
+COPY utils.py .
+COPY tf_bfgs.py .
+
+# pip warns of running as root
+# maybe create a USER (match my UID/GID?) and create a python environment
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache-dir \
+    tensorflow_probability imageio itk scikit-image keras tensorflow
+
+CMD ["INetwork.py", "--help"]
